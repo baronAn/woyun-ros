@@ -169,7 +169,7 @@
     Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     
     Jetson TX1实际上有一个USB3.0集线器，但是USB3.0的驱动程序在这里没有配置，因此它们被检测为USB2.0而不是USB3.0。
-###更新源
+### 更新源
     说明：
     介绍如何更新TX1源，方法与TK1类似
     注意：ubuntu14.04是trusty ，ubuntu16.04是xenial
@@ -195,6 +195,40 @@
     git工具是基本在任何场合需要的，优先安装
     安装命令如下：
     sudo apt-get install git
+### JETPACK自动刷机
+    说明：
+    介绍如何在Ubuntu主机上安装JetPack
+    也适用于虚拟机，但官方推荐使用独立的Ubuntu主机。
+    TX1与TK1安装过程类似
+    JetPack
+    JetPack 3.0是为Jetson开发套件安装软件工具和操作系统的工具。
+    JetPack 3.0可用于将开发工具安装在Jetson开发套件（Jetson TX1或Jetson TK1）上
+    列出了所有系统要求以及可安装的不同工具
+    只需确保选择“TX1”作为要烧录的设备类型
+    
+    注意：
+    除了Jetson TX1之外，您还需要另一台带有Intel或AMD x86处理器的台式机或笔记本电脑。
+    这些类型的机器通常被称为PC的个人电脑。该计算机被称为烧录过程的主机。
+    JetPack是一个x86二进制文件，不能在基于ARM的机器上运行。
+    参考主机配置：戴尔Inspiron 3000系列i3847-3850BK桌面（3.5 GHz英特尔酷睿i3-4150处理器，8GB DDR3，1TB硬盘，Windows 8.1，      Ubuntu安装双引导）被用作主机。
+    注册帐号：
+    要官方下载JetPack，需要先注册一个帐号。
+    进入https://developer.nvidia.com网站完成帐号注册并登录。
+    JetPack安装
+    首先在Ubuntu Host上下载最新的JetPack TX1最新的安装文件：JetPack-.run
+    其中对应的是相应的版本，目前最新版本：jetpack-l4t-3_
+    JetPack介绍页面和下载地址：
+    https://developer.nvidia.com/embedded/jetpack
+    历史版本：
+    https://developer.nvidia.com/embedded/jetpack-archive
+    现在到软件包在上传的Ubuntu主机
+    更改执行权限：
+    $ chmod +x JetPack-L4T-3.0-linux-x64.run
+    执行安装
+    $ sudo ./JetPack-L4T-3.0-linux-x64.run
+    首先是安装包选择界面，一般默认即可。
+    检查下是否选择上了CUDA Toolkit和OpenCV for Tegra，这两个包一定要装
+    接受协议
 ## 2 删除Ubuntu的用户及文件
 
 
