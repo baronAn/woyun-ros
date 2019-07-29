@@ -228,7 +228,238 @@
     $ sudo ./JetPack-L4T-3.0-linux-x64.run
     首先是安装包选择界面，一般默认即可。
     检查下是否选择上了CUDA Toolkit和OpenCV for Tegra，这两个包一定要装
+    
     接受协议
+    
+    等待主机安装完成
+    
+    输入用户名和密码，默认都是Ubuntu。
+    
+    IP的话如果不填，之后程序会自动计算出，请确保此时你有一根网线和你的宿主机相连，或者他们两者连接在同一个路由器上。
+    
+    如果你是直接用网线连接的Jetson，那么选择第二个选项。
+    这一步只有在需要刷系统的时候才会出现
+    如果选择通过路由或交换器，要求填写网卡接口
+    如果选择通过DHCP服务器,需添加互联网接口和目标接口
+    这里系统会自动帮你计算出Jetson的IP地址，但是可能时间比较长。
+    接下来会有提示将Tk1进入Recovery模式，首先对TX1上电，之后按住Recovery按键三秒以上，这时按一下Reset按键，再松开Recovery，Jetson就自动进入了Recovery模式。
+    为了判断是否成功进入Recovery模式，可以使用lsusb命令查看是否有“NVIDIA Corpration”的设备。
+    然后在Post Installation窗口按下Enter键即进入安装，安装过程根据网络状况不同时间不一
+    下面是安装确认界面，确认无误后，点击“Next”即可
+    Post Installation完成之后，显示删除下载文件
+    问题集：
+    问题：进入安装过程中，因为一些包的原因到导致失败，要求先在设备上安装相应的包，才按Enter键盘两次继续。
+
+    修复：按照提示文字操作即可。
+
+    问题：连接ports.ubuntu.com太慢，在安装好系统之后，远程登录TX1，更换源，参考TK1入门教程基础篇-更新源
+
+    修复：ports.ubuntu.com本人测试在凌晨5-8点间速度最快
+    参考：
+
+    http://docs.nvidia.com/jetpack-l4t/#developertools/mobile/jetpack/l4t/3.0/jetpack_l4t_install.htm
+    https://youtu.be/J-ma4aZyqfY
+    http://www.jianshu.com/p/997ede860d74
+    http://www.jetsonhacks.com/2015/11/22/jetpack-2-0-nvidia-jetson-development-pack-jetson-tk1/
+    http://blog.csdn.net/zyazky/article/details/52389185
+### 备份和恢复
+    说明：
+    介绍如何为TX1进行备份和恢复
+    准备：
+    准备好利用Jetpack刷过机的Ubuntu的主机(HOST PC)
+    在利用Jetpack刷机时候，建立目录TX1，并保存有JetPack-L4T-*-linux-x64.run文件
+    再进行第一次刷机之后会增加其他目录，并生成子目录TX1
+    效果如图：
+    备份:
+
+    进入HOST PC的JetPack安装目录下bootloader目录
+    $ cd ~/TX1/64_TX1/Linux_for_Tegra_64_tx1/bootloader
+    连上TX1，并进入recovery模式(通电，按住recovery键3秒，再按一下reset键)
+    检查是否出现0955:7140 Nvidia Corp
+    $ lsusb
+    效果如图：
+
+    从TX1下载镜像：
+    $ sudo ./tegraflash.py --bl cboot.bin --applet nvtboot_recovery.bin --chip 0x21 --cmd "read APP my_backup_image_APP.img"
+    效果如下：
+    sudo ./tegraflash.py --bl cboot.bin --applet nvtboot_recovery.bin --chip 0x21 --cmd "read APP my_backup_jetpack_2412_APP.img"
+
+    [sudo] password for dusty: 
+    Welcome to Tegra Flash
+    version 1.0.0
+    Type ? or help for help and q or quit to exit
+    Use ! to execute system commands
+ 
+    [   0.0025 ] Generating RCM messages
+    [   0.0047 ] tegrarcm --listrcm rcm_list.xml --chip 0x21 --download rcm nvtboot_recovery.bin 0 0
+    [   0.0059 ] RCM 0 is saved as rcm_0.rcm
+    [   0.0105 ] RCM 1 is saved as rcm_1.rcm
+    [   0.0105 ] List of rcm files are saved in rcm_list.xml
+    [   0.0105 ] 
+    [   0.0105 ] Signing RCM messages
+    [   0.0149 ] tegrasign --key None --list rcm_list.xml --pubkeyhash pub_key.hash
+    [   0.0164 ] Assuming zero filled SBK key
+    [   0.0313 ] 
+    [   0.0313 ] Copying signature to RCM mesages
+    [   0.0325 ] tegrarcm --chip 0x21 --updatesig rcm_list_signed.xml
+    [   0.0339 ] 
+    [   0.0339 ] Boot Rom communication
+    [   0.0348 ] tegrarcm --rcm rcm_list_signed.xml
+    [   0.0357 ] BootRom is not running
+    [   0.2092 ] 
+    [   0.2093 ] Retrieving storage infomation
+    [   0.2104 ] tegrarcm --oem platformdetails storage storage_info.bin
+    [   0.2113 ] Applet version 00.01.0000
+    [   0.3594 ] Saved platform info in storage_info.bin
+    [   0.3606 ] 
+    [   0.3606 ] Reading BCT from device for further operations
+    [   0.3606 ] Sending bootloader and pre-requisite binaries
+    [   0.3619 ] tegrarcm --download ebt cboot.bin 0 0
+    [   0.3630 ] Applet version 00.01.0000
+    [   0.5354 ] Sending ebt
+    [   0.5381 ] [................................................] 100%
+    [   0.8105 ] 
+    [   0.8111 ] tegrarcm --boot recovery
+    [   0.8117 ] Applet version 00.01.0000
+    大概要花30分钟左右完成镜像下载。
+
+    分配权限，并压缩保存：
+
+    $ sudo chmod 744 my_backup_jetpack_2412_APP.img
+    $ tar -zcvf my_backup_jetpack_2412_APP.img.zip my_backup_jetpack_2412_APP.img
+    备份后也可以挂载到ubuntu下进行相应编辑
+    mkdir testimg
+    sudo mount -o loop my_backup_jetpack_2412_APP.img.img  testimg
+    
+    
+    恢复:
+
+    进入HOST PC的JetPack安装目录下bootloader目录
+    $ cd ~/TX1/64_TX1/Linux_for_Tegra_64_tx1/bootloader
+    复制my_backup_jetpack_2412_APP.img为system.img
+    $ sudo cp my_backup_jetpack_2412_APP.img system.img
+    连上TX1，并进入recovery模式(通电，按住recovery键3秒，再按一下reset键)
+    检查是否出现0955:7140 Nvidia Corp
+    $ lsusb
+    退出到上一层目录，使用flash.sh开始烧录
+    $ cd ../
+    # As an example, you should be in ~/TX1/64_TX1/Linux_for_Tegra_64_tx1/
+    $ sudo ./flash.sh -r jetson-tx1 mmcblk0p1   
+    如果想恢复到SD卡或U盘，参考编译文章
+
+    或者使用tegraflash.py
+
+    $ sudo ./tegraflash.py --bl cboot.bin --applet nvtboot_recovery.bin --chip 0x21 --cmd "write my_backup_jetpack_2412_APP.img"
+    大概要花费15分钟时间完成恢复镜像。
+### 自动连接wifi
+    说明：
+    介绍TX1如何自动连接wifi
+    安装工具：
+    sudo apt-get install wireless-tools
+    修改/etc/network/interfaces文件
+    $ vim  /etc/network/interfaces
+    内容如下：
+    auto lo
+    iface lo inet loopback
+
+    auto eth0
+    iface eth0 inet dhcp
+
+
+    auto wlan0
+    iface wlan0 inet dhcp
+    wpa-ssid YOUR-SSID-HERE
+    wpa-psk YOUR-PASSWORD-HERE
+    YOUR-SSID-HERE 为wifi名称
+
+    YOUR-PASSWORD-HERE 为wifi密码
+
+    或者wifi设置固定IP
+
+    auto wlan0
+    iface wlan0 inet static
+    address 192.168.0.91
+    netmask 255.255.255.0
+    gateway 192.168.0.1
+    dns-nameservers 223.5.5.5
+    wpa-ssid YOUR-SSID-HERE
+    wpa-psk YOUR-PASSWORD-HERE
+    设置DNS解析，文件在/etc/resolv.conf。执行：
+    sudo vim /etc/resolv.conf
+    内容如下：
+    nameserver 223.5.5.5
+    nameserver 223.6.6.6
+    使用阿里DNS的IP地址
+
+    重启网络：
+
+    /etc/init.d/networking restart
+    # or: service networking restart
+    验证:
+    ifconfig           
+    ping baidu.com 
+### 实现自动开机挂载U盘
+    说明：
+
+    介绍在TX1上如何自动开机挂载U盘
+    步骤：
+
+    检查U盘
+    sudo fdisk -l
+    效果：
+    Disk /dev/sda: 28.7 GiB, 30752000000 bytes, 60062500 sectors
+    Units: sectors of 1 * 512 = 512 bytes
+    Sector size (logical/physical): 512 bytes / 512 bytes
+    I/O size (minimum/optimal): 512 bytes / 512 bytes
+    Disklabel type: dos
+    Disk identifier: 0xcad4ebea
+
+    Device     Boot Start      End  Sectors  Size Id Type
+    /dev/sda4  *      256 60062499 60062244 28.7G 83 Linux
+    手工挂载，检测是否可用：
+    mkdir /media/ubuntu/usb
+    sudo mount /dev/sda4 /media/ubuntu/usb
+    ls /media/ubuntu/usb
+    手工卸载
+    sudo umount /media/ubuntu/usb
+    自动开机挂载：
+
+    打开fstab文件
+    sudo vim /etc/fstab
+    添加如下内容：
+    /dev/sda4 /media/ubuntu/usb auto defaults  0 0
+    重新启动，检查是否挂载成功
+    df -h 
+    效果：
+    ubuntu@tegra-ubuntu:~$ df -h
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/mmcblk0p1   14G   12G  1.1G  92% /
+    none            2.0G     0  2.0G   0% /dev
+    tmpfs           2.0G  168K  2.0G   1% /dev/shm
+    tmpfs           2.0G  9.3M  2.0G   1% /run
+    tmpfs           5.0M  4.0K  5.0M   1% /run/lock
+    tmpfs           2.0G     0  2.0G   0% /sys/fs/cgroup
+    tmpfs           400M   48K  400M   1% /run/user/1000
+    /dev/sda4        29G  2.3G   25G   9% /media/ubuntu/usb
+### 安装简单版刷机包
+    说明：
+
+    在ubuntu系统安装完整的jetpack软件花费时间很长
+    目前只需要做备份和刷机使用，只需要安装刷机部分软件即可
+    步骤：
+
+    搜索刷机包：
+    https://developer.nvidia.com/embedded/downloads#?search=TX1&tx=$software,l4t-tx1
+    找到 L4T Jetson TX1 Driver Package 28.1 2017/07/24 以后点开，右边有具体下载地址
+    我们这里是jetpack3.0的刷机包，名为l4t-jetson-tx1-driver-package-28-1
+    下载刷机包
+    $ mkdir -p ~/tools/jetpack/tx1
+    $ cd ~/tools/jetpack/tx1
+    $ wget -O l4t-tx1-28-1.tbz2 https://developer.nvidia.com/embedded/dlc/l4t-jetson-tx1-driver-package-28-1 
+    解压包
+    $ bzip2 -d l4t-tx1-28-1.tbz2
+    $ tar xf l4t-tx1-28-1.tar
+    备份和恢复：TX1入门教程基础篇-备份和恢复
 ## 2 删除Ubuntu的用户及文件
 
 
