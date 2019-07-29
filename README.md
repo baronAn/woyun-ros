@@ -3,34 +3,34 @@
 
 ## 1 TX1嵌入式开发板介绍
 ### 硬件介绍
-  ～Jetson TX1是NVIDIA第二代嵌入式开发者套件。
-  ～虽然只有信用卡大小，但Jetson TX1 GPU模块的浮点运算能力却达到1 Teraflops，相比Jetson TK1有巨幅提升。
-  ～内建256个CUDA核心的NVIDIA Maxwell GPU，64位ARM A57 CPU，4GB LPDDR4内存，16GB闪存，蓝牙，802.11ac Wi-Fi模块和千兆以太网卡，运     行Linux for Tegra操作系统。
-  ～主板提供了USB 3.0 A型，USB 2.0，HDMI，M.2键E，PCI-E x4，千兆以太网，SD，SATA数据和供电等接口
-  ～针对硬件创客的扩展接口：GPIO，I2C，I2S，SPI，带流控制的TTL UART，显示器扩展头和摄像头扩展头一个不少
-  ～如此强大的性能，Jetson TX1显然是智能无人机，机器人最理想的嵌入式解决方案。
-处理组件
-  四核ARM Cortex-A57
-  256核Maxwell GPU
-  4GB LPDDR4
-  16GB eMMC
-  H.264 / H.265编码器和解码器
-  双ISP（图像服务处理器）
-端口和外围设备
-  HDMI 2.0
-  802.11ac WiFi，蓝牙4.0
-  USB3，USB2
-  千兆以太网
-  12车道MIPI CSI 2.0
-  4车道PCIe gen 2.0
-  SATA，2x SD卡
-  3x UART，3x SPI，4x I2C
-硬件参数
-  400针Samtec板对板连接器
-  尺寸：50x87mm（1.96“x 3.42”）
-  质量：45克
-  热转印板（TTP），-25C至85C的工作温度
-  5.5-19.6VDC输入功率（在典型负载下消耗10-15W）
+    Jetson TX1是NVIDIA第二代嵌入式开发者套件。
+    虽然只有信用卡大小，但Jetson TX1 GPU模块的浮点运算能力却达到1 Teraflops，相比Jetson TK1有巨幅提升。
+    内建256个CUDA核心的NVIDIA Maxwell GPU，64位ARM A57 CPU，4GB LPDDR4内存，16GB闪存，蓝牙，802.11ac Wi-Fi模块和千兆以太网卡，运 行Linux for Tegra操作系统。
+    主板提供了USB 3.0 A型，USB 2.0，HDMI，M.2键E，PCI-E x4，千兆以太网，SD，SATA数据和供电等接口
+    针对硬件创客的扩展接口：GPIO，I2C，I2S，SPI，带流控制的TTL UART，显示器扩展头和摄像头扩展头一个不少
+    如此强大的性能，Jetson TX1显然是智能无人机，机器人最理想的嵌入式解决方案。
+    处理组件
+    四核ARM Cortex-A57
+    256核Maxwell GPU
+    4GB LPDDR4
+    16GB eMMC
+    H.264 / H.265编码器和解码器
+    双ISP（图像服务处理器）
+    端口和外围设备
+    HDMI 2.0
+    802.11ac WiFi，蓝牙4.0
+    USB3，USB2
+    千兆以太网
+    12车道MIPI CSI 2.0
+    4车道PCIe gen 2.0
+    SATA，2x SD卡
+    3x UART，3x SPI，4x I2C
+    硬件参数
+    400针Samtec板对板连接器
+    尺寸：50x87mm（1.96“x 3.42”）
+    质量：45克
+    热转印板（TTP），-25C至85C的工作温度
+    5.5-19.6VDC输入功率（在典型负载下消耗10-15W）
 ### 检查L4T各种系统参数
     查看Jetson TX1 L4T版本：
     head -n 1 /etc/nv_tegra_release
@@ -169,12 +169,37 @@
     Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
     
     Jetson TX1实际上有一个USB3.0集线器，但是USB3.0的驱动程序在这里没有配置，因此它们被检测为USB2.0而不是USB3.0。
+###更新源
+    说明：
+    介绍如何更新TX1源，方法与TK1类似
+    注意：ubuntu14.04是trusty ，ubuntu16.04是xenial
+    对于安装软件或升级软件必不可少要更新源：
+    sudo apt-add-repository universe
+    sudo apt-get update
+    国内源：
+    对于国外源 http://ports.ubuntu.com/ubuntu-ports/ 更新总是太慢
+    ARM的ubuntu源不多，可以参考中国科学技术大学的源:http://mirrors.ustc.edu.cn/help/ubuntu-ports.html
+    更换方法：
+    sudo vim /etc/apt/sources.list
+    先注释掉http://ports.ubuntu.com/ubuntu-ports/，在文件末添加如下内容：
+    deb http://mirrors.ustc.edu.cn/ubuntu-ports/  xenial main restricted universe multiverse
+    deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/  xenial main restricted universe multiverse
+    deb http://mirrors.ustc.edu.cn/ubuntu-ports/  xenial-updates main restricted universe multiverse
+    deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/  xenial-updates main restricted universe multiverse
+    deb http://mirrors.ustc.edu.cn/ubuntu-ports/  xenial-security main restricted universe multiverse
+    deb-src http://mirrors.ustc.edu.cn/ubuntu-ports/  xenial-security main restricted universe multiverse
+    保存退出，执行更新
+    sudo apt-get update
+    之后就可以用新的源了。
+    安装GIT：
+    git工具是基本在任何场合需要的，优先安装
+    安装命令如下：
+    sudo apt-get install git
+## 2 删除Ubuntu的用户及文件
 
-### 2 删除Ubuntu的用户及文件
 
 
 
 
 
-
-### 3 TXI挂载SD卡
+## 3 TXI挂载SD卡
